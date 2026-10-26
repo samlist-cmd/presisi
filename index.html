@@ -137,16 +137,24 @@
       <!-- TAB 1: PRESENSI OTOMATIS -->
       <div id="tabContentPresensi" class="max-w-md mx-auto bg-white p-4 rounded-b-xl border border-t-0 space-y-4 shadow-sm no-print">
         
-        <!-- FILTER KELAS PRESENSI UNTUK AKURASI 100% -->
+        <!-- FILTER KELAS / TINGKAT PRESENSI -->
         <div>
           <label class="block text-xs font-semibold text-slate-700 mb-1">
-            <i class="fa-solid fa-filter text-emerald-600 mr-1"></i> Pilih Kelas Presensi:
+            <i class="fa-solid fa-filter text-emerald-600 mr-1"></i> Pilih Kelas / Tingkat Presensi:
           </label>
           <select id="kelasPresensi" onchange="updatePresensiFaceMatcher()" class="w-full px-3 py-2 border border-emerald-300 rounded-lg text-sm bg-emerald-50/50 font-bold text-emerald-900 focus:ring-2 focus:ring-emerald-500 outline-none">
             <option value="ALL">Semua Kelas (Deteksi Global)</option>
-            <option value="7A">Kelas 7A</option><option value="7B">Kelas 7B</option><option value="7C">Kelas 7C</option><option value="7D">Kelas 7D</option><option value="7E">Kelas 7E</option><option value="7F">Kelas 7F</option><option value="7G">Kelas 7G</option><option value="7H">Kelas 7H</option><option value="7I">Kelas 7I</option>
-            <option value="8A">Kelas 8A</option><option value="8B">Kelas 8B</option><option value="8C">Kelas 8C</option><option value="8D">Kelas 8D</option><option value="8E">Kelas 8E</option><option value="8F">Kelas 8F</option><option value="8G">Kelas 8G</option><option value="8H">Kelas 8H</option><option value="8I">Kelas 8I</option>
-            <option value="9A">Kelas 9A</option><option value="9B">Kelas 9B</option><option value="9C">Kelas 9C</option><option value="9D">Kelas 9D</option><option value="9E">Kelas 9E</option><option value="9F">Kelas 9F</option><option value="9G">Kelas 9G</option><option value="9H">Kelas 9H</option><option value="9I">Kelas 9I</option>
+            <optgroup label="Berdasarkan Tingkat">
+              <option value="T7">Tingkat 7 (7A - 7I)</option>
+              <option value="T8">Tingkat 8 (8A - 8I)</option>
+              <option value="T9">Tingkat 9 (9A - 9I)</option>
+            </optgroup>
+            <optgroup label="Kelas Spesifik">
+              <option value="7A">Kelas 7A</option><option value="7B">Kelas 7B</option><option value="7C">Kelas 7C</option><option value="7D">Kelas 7D</option><option value="7E">Kelas 7E</option><option value="7F">Kelas 7F</option><option value="7G">Kelas 7G</option><option value="7H">Kelas 7H</option><option value="7I">Kelas 7I</option>
+              <option value="8A">Kelas 8A</option><option value="8B">Kelas 8B</option><option value="8C">Kelas 8C</option><option value="8D">Kelas 8D</option><option value="8E">Kelas 8E</option><option value="8F">Kelas 8F</option><option value="8G">Kelas 8G</option><option value="8H">Kelas 8H</option><option value="8I">Kelas 8I</option>
+              <option value="9A">Kelas 9A</option><option value="9B">Kelas 9B</option><option value="9C">Kelas 9C</option><option value="9D">Kelas 9D</option><option value="9E">Kelas 9E</option><option value="9F">Kelas 9F</option><option value="9G">Kelas 9G</option><option value="9H">Kelas 9H</option><option value="9I">Kelas 9I</option>
+              <option value="Guru">Guru / Staf</option>
+            </optgroup>
           </select>
         </div>
 
@@ -188,23 +196,24 @@
       <!-- TAB 2: REKAM WAJAH SISWA -->
       <div id="tabContentWajah" class="max-w-md mx-auto hidden bg-white p-4 rounded-b-xl border border-t-0 space-y-4 shadow-sm no-print">
         <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 p-2.5 rounded-lg text-xs">
-          <i class="fa-solid fa-user-plus mr-1"></i> Form Pendaftaran Master Wajah Siswa
+          <i class="fa-solid fa-user-plus mr-1"></i> Form Pendaftaran Master Wajah Siswa / Guru
         </div>
 
         <div class="space-y-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">1. Pilih Kelas Siswa</label>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">1. Pilih Kelas / Kategori</label>
             <select id="kelasWajah" onchange="onKelasWajahChange()" class="w-full px-3 py-2 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-emerald-500 outline-none">
               <option value="">-- Pilih Kelas --</option>
               <option value="7A">Kelas 7A</option><option value="7B">Kelas 7B</option><option value="7C">Kelas 7C</option><option value="7D">Kelas 7D</option><option value="7E">Kelas 7E</option><option value="7F">Kelas 7F</option><option value="7G">Kelas 7G</option><option value="7H">Kelas 7H</option><option value="7I">Kelas 7I</option>
               <option value="8A">Kelas 8A</option><option value="8B">Kelas 8B</option><option value="8C">Kelas 8C</option><option value="8D">Kelas 8D</option><option value="8E">Kelas 8E</option><option value="8F">Kelas 8F</option><option value="8G">Kelas 8G</option><option value="8H">Kelas 8H</option><option value="8I">Kelas 8I</option>
               <option value="9A">Kelas 9A</option><option value="9B">Kelas 9B</option><option value="9C">Kelas 9C</option><option value="9D">Kelas 9D</option><option value="9E">Kelas 9E</option><option value="9F">Kelas 9F</option><option value="9G">Kelas 9G</option><option value="9H">Kelas 9H</option><option value="9I">Kelas 9I</option>
+              <option value="Guru">Guru / Staf</option>
             </select>
           </div>
 
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">2. Pilih ID Anak / NIS</label>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">2. Pilih ID / NIP / NIS</label>
               <select id="idAnakWajah" onchange="onNisWajahChange()" class="w-full px-3 py-2 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-emerald-500 outline-none">
                 <option value="">-- Pilih NIS --</option>
               </select>
@@ -226,7 +235,7 @@
 
         <button onclick="submitRekamWajah()" id="btnSubmitWajah" 
                 class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl text-sm transition shadow">
-          <i class="fa-solid fa-floppy-disk mr-1.5"></i> Simpan Master Wajah Siswa
+          <i class="fa-solid fa-floppy-disk mr-1.5"></i> Simpan Master Wajah Siswa / Guru
         </button>
       </div>
 
@@ -273,12 +282,16 @@
                 <input type="date" id="filterTanggal" onchange="renderFilteredRekap()" class="w-full px-2 py-1 border rounded bg-white outline-none">
               </div>
               <div>
-                <label class="block text-[10px] text-slate-500 mb-0.5">Kelas</label>
-                <select id="filterKelas" onchange="renderFilteredRekap()" class="w-full px-2 py-1 border rounded bg-white outline-none">
+                <label class="block text-[10px] text-slate-500 mb-0.5">Kelas / Tingkat</label>
+                <select id="filterKelas" onchange="renderFilteredRekap()" class="w-full px-2 py-1 border rounded bg-white outline-none font-semibold">
                   <option value="ALL">Semua Kelas</option>
+                  <option value="T7">Tingkat 7 (7A - 7I)</option>
+                  <option value="T8">Tingkat 8 (8A - 8I)</option>
+                  <option value="T9">Tingkat 9 (9A - 9I)</option>
                   <option value="7A">7A</option><option value="7B">7B</option><option value="7C">7C</option><option value="7D">7D</option><option value="7E">7E</option><option value="7F">7F</option><option value="7G">7G</option><option value="7H">7H</option><option value="7I">7I</option>
                   <option value="8A">8A</option><option value="8B">8B</option><option value="8C">8C</option><option value="8D">8D</option><option value="8E">8E</option><option value="8F">8F</option><option value="8G">8G</option><option value="8H">8H</option><option value="8I">8I</option>
                   <option value="9A">9A</option><option value="9B">9B</option><option value="9C">9C</option><option value="9D">9D</option><option value="9E">9E</option><option value="9F">9F</option><option value="9G">9G</option><option value="9H">9H</option><option value="9I">9I</option>
+                  <option value="Guru">Guru / Staf</option>
                 </select>
               </div>
               <div>
@@ -338,12 +351,16 @@
                 </select>
               </div>
               <div>
-                <label class="block text-[10px] text-slate-500 mb-0.5">Kelas</label>
+                <label class="block text-[10px] text-slate-500 mb-0.5">Kelas / Tingkat</label>
                 <select id="matrixKelas" onchange="renderMatrixBulanan()" class="w-full px-2 py-1 border rounded bg-white outline-none font-semibold">
+                  <option value="ALL">Semua Kelas</option>
+                  <option value="T7">Tingkat 7 (7A - 7I)</option>
+                  <option value="T8">Tingkat 8 (8A - 8I)</option>
+                  <option value="T9">Tingkat 9 (9A - 9I)</option>
                   <option value="7A">7A</option><option value="7B">7B</option><option value="7C">7C</option><option value="7D">7D</option><option value="7E">7E</option><option value="7F">7F</option><option value="7G">7G</option><option value="7H">7H</option><option value="7I">7I</option>
                   <option value="8A">8A</option><option value="8B">8B</option><option value="8C">8C</option><option value="8D">8D</option><option value="8E">8E</option><option value="8F">8F</option><option value="8G">8G</option><option value="8H">8H</option><option value="8I">8I</option>
                   <option value="9A">9A</option><option value="9B">9B</option><option value="9C">9C</option><option value="9D">9D</option><option value="9E">9E</option><option value="9F">9F</option><option value="9G">9G</option><option value="9H">9H</option><option value="9I">9I</option>
-                  <option value="ALL">Semua Kelas</option>
+                  <option value="Guru">Guru / Staf</option>
                 </select>
               </div>
               <div>
@@ -414,12 +431,16 @@
                 </select>
               </div>
               <div>
-                <label class="block text-[10px] text-slate-500 mb-0.5">Kelas</label>
+                <label class="block text-[10px] text-slate-500 mb-0.5">Kelas / Tingkat</label>
                 <select id="summaryKelas" onchange="renderRingkasanTidakSholat()" class="w-full px-2 py-1 border rounded bg-white outline-none font-semibold">
                   <option value="ALL">Semua Kelas</option>
+                  <option value="T7">Tingkat 7 (7A - 7I)</option>
+                  <option value="T8">Tingkat 8 (8A - 8I)</option>
+                  <option value="T9">Tingkat 9 (9A - 9I)</option>
                   <option value="7A">7A</option><option value="7B">7B</option><option value="7C">7C</option><option value="7D">7D</option><option value="7E">7E</option><option value="7F">7F</option><option value="7G">7G</option><option value="7H">7H</option><option value="7I">7I</option>
                   <option value="8A">8A</option><option value="8B">8B</option><option value="8C">8C</option><option value="8D">8D</option><option value="8E">8E</option><option value="8F">8F</option><option value="8G">8G</option><option value="8H">8H</option><option value="8I">8I</option>
                   <option value="9A">9A</option><option value="9B">9B</option><option value="9C">9C</option><option value="9D">9D</option><option value="9E">9E</option><option value="9F">9F</option><option value="9G">9G</option><option value="9H">9H</option><option value="9I">9I</option>
+                  <option value="Guru">Guru / Staf</option>
                 </select>
               </div>
               <div>
@@ -553,6 +574,31 @@
 
     function cetakRekap() {
       window.print();
+    }
+
+    // HELPER UNTUK COCOK KELAS / TINGKAT
+    function matchKelasFilter(siswaKelas, filter) {
+      if (!siswaKelas) return false;
+      const k = siswaKelas.toString().trim().toUpperCase();
+      const f = filter.toString().trim().toUpperCase();
+      if (f === 'ALL') return true;
+      if (f === 'T7') return k.startsWith('7');
+      if (f === 'T8') return k.startsWith('8');
+      if (f === 'T9') return k.startsWith('9');
+      return k === f;
+    }
+
+    // HELPER URUTKAN DAFAR SISWA BERDASARKAN KELAS (7A..9I..GURU) LALU NAMA
+    function sortSiswaByKelasAndName(list) {
+      return [...list].sort((a, b) => {
+        const kA = (a.kelas || '').toString().trim();
+        const kB = (b.kelas || '').toString().trim();
+        const cComp = kA.localeCompare(kB, undefined, { numeric: true, sensitivity: 'base' });
+        if (cComp !== 0) return cComp;
+        const nA = (a.namaAnak || '').toString().trim();
+        const nB = (b.namaAnak || '').toString().trim();
+        return nA.localeCompare(nB, undefined, { sensitivity: 'base' });
+      });
     }
 
     async function postToGoogleSheets(payload) {
@@ -720,13 +766,13 @@
 
       let filteredItems = allMasterDescriptors;
       if (selectedKelas !== 'ALL') {
-        filteredItems = allMasterDescriptors.filter(item => item.kelas === selectedKelas.trim().toUpperCase());
+        filteredItems = allMasterDescriptors.filter(item => matchKelasFilter(item.kelas, selectedKelas));
       }
 
       const listDescriptors = filteredItems.map(item => item.descriptor);
 
       if (listDescriptors.length > 0) {
-        // PERKETAT DISTANCE THRESHOLD KE 0.32 UNTUK BEBAS AKURAT
+        // DISTANCE THRESHOLD PERKETAT KE 0.32 UNTUK BEBAS SALAH DETEKSI
         faceMatcher = new faceapi.FaceMatcher(listDescriptors, 0.32);
       } else {
         faceMatcher = null;
@@ -743,7 +789,7 @@
 
       if (!selectedKelas) return;
 
-      const filteredSiswa = allSiswaList.filter(s => s.kelas.toString().trim().toUpperCase() === selectedKelas.trim().toUpperCase());
+      const filteredSiswa = sortSiswaByKelasAndName(allSiswaList.filter(s => s.kelas.toString().trim().toUpperCase() === selectedKelas.trim().toUpperCase()));
 
       filteredSiswa.forEach(s => {
         const opt = document.createElement('option');
@@ -823,12 +869,11 @@
 
         if (!faceMatcher) {
           statusDiv.className = "absolute bottom-2 left-2 right-2 bg-amber-600/90 text-white px-3 py-1.5 rounded-lg text-xs text-center";
-          statusDiv.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> Data Wajah untuk kelas ini kosong / belum direkam.`;
+          statusDiv.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> Master Wajah untuk kelas/tingkat ini belum direkam.`;
           return;
         }
 
         try {
-          // RESOLUSI PINDAI 416 & SCORE THRESHOLD 0.65
           const detection = await faceapi.detectSingleFace(
             video, 
             new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.65 })
@@ -888,11 +933,11 @@
       const btn = document.getElementById('btnSubmitWajah');
 
       if (!kelas) {
-        alert("Harap pilih Kelas siswa terlebih dahulu!");
+        alert("Harap pilih Kelas/Kategori terlebih dahulu!");
         return;
       }
       if (!idAnak || !namaAnak) {
-        alert("Harap pilih ID Anak / NIS terlebih dahulu!");
+        alert("Harap pilih ID / NIS terlebih dahulu!");
         return;
       }
 
@@ -908,7 +953,7 @@
         if (!detection) {
           alert("Wajah tidak terdeteksi presisi! Pastikan posisi wajah tegak dan cahaya cukup.");
           btn.disabled = false;
-          btn.innerHTML = '<i class="fa-solid fa-floppy-disk mr-1.5"></i> Simpan Master Wajah Siswa';
+          btn.innerHTML = '<i class="fa-solid fa-floppy-disk mr-1.5"></i> Simpan Master Wajah Siswa / Guru';
           return;
         }
 
@@ -935,7 +980,7 @@
         alert("Gagal merekam data wajah.");
       } finally {
         btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-floppy-disk mr-1.5"></i> Simpan Master Wajah Siswa';
+        btn.innerHTML = '<i class="fa-solid fa-floppy-disk mr-1.5"></i> Simpan Master Wajah Siswa / Guru';
       }
     }
 
@@ -1024,7 +1069,7 @@
         const itemDate = item.waktu ? item.waktu.substring(0, 10) : '';
 
         if (filterTanggal && itemDate !== filterTanggal) return false;
-        if (filterKelas !== 'ALL' && item.kelas !== filterKelas) return false;
+        if (!matchKelasFilter(item.kelas, filterKelas)) return false;
 
         if (filterSholat !== 'ALL') {
           if (filterSholat === 'Lainnya') {
@@ -1036,6 +1081,15 @@
         }
 
         return true;
+      });
+
+      // URUTKAN BERDASARKAN KELAS A-I DULU LALU NAMA
+      filtered.sort((a, b) => {
+        const kA = (a.kelas || '').toString().trim();
+        const kB = (b.kelas || '').toString().trim();
+        const cComp = kA.localeCompare(kB, undefined, { numeric: true, sensitivity: 'base' });
+        if (cComp !== 0) return cComp;
+        return (a.namaAnak || '').toString().trim().localeCompare((b.namaAnak || '').toString().trim());
       });
 
       const tbody = document.getElementById('rekapTableBody');
@@ -1068,10 +1122,13 @@
 
       let targetSiswa = allSiswaList;
       if (selectedKelas !== 'ALL') {
-        targetSiswa = allSiswaList.filter(s => (s.kelas || '').toString().trim().toUpperCase() === selectedKelas.trim().toUpperCase());
+        targetSiswa = allSiswaList.filter(s => matchKelasFilter(s.kelas, selectedKelas));
       }
 
-      document.getElementById('matrixTotalSiswa').innerText = `Total: ${targetSiswa.length} Siswa`;
+      // URUTKAN TARGET SISWA DARI KELAS A-I LALU NAMA
+      targetSiswa = sortSiswaByKelasAndName(targetSiswa);
+
+      document.getElementById('matrixTotalSiswa').innerText = `Total: ${targetSiswa.length} Siswa/Staf`;
 
       const presensiMap = {};
 
@@ -1130,9 +1187,9 @@
       const headerThead = document.getElementById('matrixHeader');
       let thHTML = `<tr class="border-b border-slate-300">
         <th class="p-1.5 border-r min-w-[30px]">No</th>
-        <th class="p-1.5 border-r min-w-[60px]">ID Anak/NIS</th>
+        <th class="p-1.5 border-r min-w-[60px]">ID / NIS</th>
         <th class="p-1.5 border-r min-w-[70px]">NISN</th>
-        <th class="p-1.5 border-r text-left min-w-[150px]">Nama Anak</th>
+        <th class="p-1.5 border-r text-left min-w-[150px]">Nama Lengkap</th>
         <th class="p-1.5 border-r min-w-[30px]">L/P</th>
         <th class="p-1.5 border-r min-w-[40px]">Kelas</th>`;
 
@@ -1144,7 +1201,7 @@
 
       const bodyTbody = document.getElementById('matrixBody');
       if (targetSiswa.length === 0) {
-        bodyTbody.innerHTML = `<tr><td colspan="${6 + totalHariBulan}" class="p-4 text-center text-slate-400">Tidak ada data siswa untuk kelas ini.</td></tr>`;
+        bodyTbody.innerHTML = `<tr><td colspan="${6 + totalHariBulan}" class="p-4 text-center text-slate-400">Tidak ada data untuk kelas/tingkat ini.</td></tr>`;
         return;
       }
 
@@ -1154,7 +1211,7 @@
         const sKelas = (s.kelas || '').toString().trim().toUpperCase();
 
         bodyHTML += `<tr class="border-b hover:bg-slate-50 border-slate-200">
-          <td class="p-1 border-r font-mono text-center">${s.no || (idx + 1)}</td>
+          <td class="p-1 border-r font-mono text-center">${idx + 1}</td>
           <td class="p-1 border-r font-mono text-center">${sId}</td>
           <td class="p-1 border-r font-mono text-slate-500 text-center">${s.nisn || '-'}</td>
           <td class="p-1 border-r font-semibold text-left text-slate-800 whitespace-nowrap">${s.namaAnak}</td>
@@ -1218,7 +1275,7 @@
 
       let targetSiswa = allSiswaList;
       if (selectedKelas !== 'ALL') {
-        targetSiswa = allSiswaList.filter(s => (s.kelas || '').toString().trim().toUpperCase() === selectedKelas.trim().toUpperCase());
+        targetSiswa = allSiswaList.filter(s => matchKelasFilter(s.kelas, selectedKelas));
       }
 
       const presensiMap = {};
@@ -1324,10 +1381,20 @@
         };
       });
 
-      summaryList.sort((a, b) => b.countTidakSholat - a.countTidakSholat);
+      // PENGURUTAN: JUMLAH TIDAK SHOLAT TERBANYAK -> KELAS (A-I) -> NAMA
+      summaryList.sort((a, b) => {
+        if (b.countTidakSholat !== a.countTidakSholat) {
+          return b.countTidakSholat - a.countTidakSholat;
+        }
+        const kA = (a.kelas || '').toString().trim();
+        const kB = (b.kelas || '').toString().trim();
+        const cComp = kA.localeCompare(kB, undefined, { numeric: true, sensitivity: 'base' });
+        if (cComp !== 0) return cComp;
+        return (a.namaAnak || '').toString().trim().localeCompare((b.namaAnak || '').toString().trim());
+      });
 
       const tbody = document.getElementById('summaryTableBody');
-      document.getElementById('summaryTotalSiswa').innerText = `Total: ${summaryList.length} Siswa`;
+      document.getElementById('summaryTotalSiswa').innerText = `Total: ${summaryList.length} Siswa/Staf`;
 
       if (summaryList.length === 0) {
         tbody.innerHTML = '<tr><td colspan="10" class="p-4 text-center text-slate-400">Tidak ada data.</td></tr>';
