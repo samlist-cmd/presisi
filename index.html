@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PRESENSI SHOLAT SPENSAKA SMP NEGERI 1 KANDAT</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- LIBRARY PEMINDAI WAJAH OTOMATIS -->
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+
+  <!-- CSS KHUSUS CETAK & EXPORT PDF KERTAS F4 LANDSCAPE -->
+  <style>
+    @media print {
+      body {
+        background: #fff !important;
+        color: #000 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      header, #loginView, #userLabel, #roleBadge, button, select, input, .no-print, #cameraFacingContainer {
+        display: none !important;
+      }
+      #dashboardView > div:not(#tabContentRekap) {
+        display: none !important;
+      }
+      #tabContentRekap {
+        display: block !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+      }
+      .overflow-x-auto, .max-h-\[500px\] {
+        overflow: visible !important;
+        max-height: none !important;
+      }
+      table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        font-size: 8pt !important;
+      }
+      th, td {
+        border: 1px solid #000 !important;
+        padding: 3px 2px !important;
+      }
+      .bg-slate-50, .bg-slate-100 {
+        background-color: transparent !important;
+      }
+      @page {
+        size: 330mm 215mm;
+        margin: 6mm;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800">
+
+  <!-- HEADER UTAMA -->
+  <header class="bg-emerald-700 text-white p-4 shadow-md no-print">
+    <div class="max-w-xl mx-auto flex items-center justify-center space-x-3 text-center">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRESVnGGzgEIkf9q6nFxX3TJ2oCPb2g8wWhobdhB6didA&s" 
+           alt="Logo Sekolah" class="w-12 h-12 rounded-full bg-white p-1 object-contain shadow">
+      <div class="text-left">
+        <h1 class="font-bold text-base leading-tight uppercase">PRESENSI SHOLAT SPENSAKA</h1>
+        <p class="text-xs text-emerald-200 uppercase">SMP NEGERI 1 KANDAT</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto p-3">
+
+    <!-- 1. HALAMAN LOGIN -->
+    <div id="loginView" class="max-w-md mx-auto bg-white rounded-2xl shadow-sm border p-6 space-y-4 no-print">
+      <div class="text-center space-y-1">
+        <div class="inline-block p-3 bg-emerald-50 rounded-full text-emerald-700 mb-1">
+          <i class="fa-solid fa-camera-rotate text-2xl"></i>
+        </div>
+        <h2 class="text-lg font-bold text-emerald-800 uppercase">LOGIN SISTEM PRESENSI</h2>
+        <p class="text-xs text-slate-500">Silakan login menggunakan akun Anda</p>
+      </div>
+
+      <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Username</label>
+          <input type="text" id="loginUsername" required placeholder="Masukkan username" 
+                 class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 text-sm outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Password</label>
+          <input type="password" id="loginPassword" required placeholder="••••••••" 
+                 class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 text-sm outline-none">
+        </div>
+        <button type="submit" id="btnLogin" 
+                class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg text-sm transition shadow">
+          <i class="fa-solid fa-right-to-bracket mr-1.5"></i> Buka Aplikasi
+        </button>
+      </form>
+    </div>
+
+    <!-- 2. DASHBOARD UTAMA -->
+    <div id="dashboardView" class="hidden space-y-4">
+      
+      <!-- USER INFO HEADER -->
+      <div class="bg-white p-3.5 rounded-xl border flex items-center justify-between text-xs shadow-sm max-w-2xl mx-auto no-print">
+        <div>
+          <p class="text-slate-400">Pengguna Login:</p>
+          <p id="userLabel" class="font-bold text-emerald-800 text-sm">-</p>
+          <span id="roleBadge" class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold">Role</span>
+        </div>
+        <button onclick="handleLogout()" class="text-red-500 hover:bg-red-50 px-3 py-1.5 rounded-lg font-semibold border border-red-200">
+          <i class="fa-solid fa-power-off mr-1"></i> Keluar
+        </button>
+      </div>
+
+      <!-- TAB MENU UTAMA -->
+      <div class="flex border-b border-slate-200 bg-white rounded-t-xl overflow-hidden border max-w-2xl mx-auto no-print">
+        <button id="tabBtnPresensi" onclick="switchTab('presensi')" 
+                class="flex-1 py-2.5 text-center text-[11px] font-bold border-b-2 border-emerald-600 text-emerald-700 bg-emerald-50">
+          <i class="fa-solid fa-camera block mb-0.5 text-sm"></i> Presensi
+        </button>
+        <button id="tabBtnWajah" onclick="switchTab('wajah')" 
+                class="flex-1 py-2.5 text-center text-[11px] font-bold text-slate-500 hover:text-emerald-600">
+          <i class="fa-solid fa-face-smile block mb-0.5 text-sm"></i> Rekam Wajah
+        </button>
+        <button id="tabBtnRekap" onclick="switchTab('rekap')" 
+                class="flex-1 py-2.5 text-center text-[11px] font-bold text-slate-500 hover:text-emerald-600">
+          <i class="fa-solid fa-list-check block mb-0.5 text-sm"></i> Rekap Data
+        </button>
+        <button id="tabBtnUsers" onclick="switchTab('users')" 
+                class="flex-1 py-2.5 text-center text-[11px] font-bold text-slate-500 hover:text-emerald-600">
+          <i class="fa-solid fa-users-gear block mb-0.5 text-sm"></i> Kelola User
+        </button>
+      </div>
+
+      <!-- TAB 1: PRESENSI OTOMATIS -->
+      <div id="tabContentPresensi" class="max-w-md mx-auto bg-white p-4 rounded-b-xl border border-t-0 space-y-4 shadow-sm no-print">
+        
+        <!-- FILTER KELAS PRESENSI UNTUK AKURASI 100% -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">
+            <i class="fa-solid fa-filter text-emerald-600 mr-1"></i> Pilih Kelas Presensi:
+          </label>
+          <select id="kelasPresensi" onchange="updatePresensiFaceMatcher()" class="w-full px-3 py-2 border border-emerald-300 rounded-lg text-sm bg-emerald-50/50 font-bold text-emerald-900 focus:ring-2 focus:ring-emerald-500 outline-none">
+            <option value="ALL">Semua Kelas (Deteksi Global)</option>
+            <option value="7A">Kelas 7A</option><option value="7B">Kelas 7B</option><option value="7C">Kelas 7C</option><option value="7D">Kelas 7D</option><option value="7E">Kelas 7E</option><option value="7F">Kelas 7F</option><option value="7G">Kelas 7G</option><option value="7H">Kelas 7H</option><option value="7I">Kelas 7I</option>
+            <option value="8A">Kelas 8A</option><option value="8B">Kelas 8B</option><option value="8C">Kelas 8C</option><option value="8D">Kelas 8D</option><option value="8E">Kelas 8E</option><option value="8F">Kelas 8F</option><option value="8G">Kelas 8G</option><option value="8H">Kelas 8H</option><option value="8I">Kelas 8I</option>
+            <option value="9A">Kelas 9A</option><option value="9B">Kelas 9B</option><option value="9C">Kelas 9C</option><option value="9D">Kelas 9D</option><option value="9E">Kelas 9E</option><option value="9F">Kelas 9F</option><option value="9G">Kelas 9G</option><option value="9H">Kelas 9H</option><option value="9I">Kelas 9I</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Pilih Kegiatan / Sholat:</label>
+          <select id="jenisSholat" onchange="toggleJenisSholatLainnya()" class="w-full px-3 py-2 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-emerald-500 outline-none">
+            <option value="Dhuha">Dhuha</option>
+            <option value="Dzuhur">Dzuhur</option>
+            <option value="Jumat">Jumat</option>
+            <option value="Istighosah">Istighosah</option>
+            <option value="Maulid Nabi">Maulid Nabi</option>
+            <option value="Idul Adha">Idul Adha</option>
+            <option value="Haid">Haid</option>
+            <option value="Lainnya">Lainnya (Ketik Manual)</option>
+          </select>
+        </div>
+
+        <div id="containerSholatLainnya" class="hidden">
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Tuliskan Nama Sholat / Kegiatan:</label>
+          <input type="text" id="inputSholatLainnya" placeholder="Contoh: Sholat Hajat" class="w-full px-3 py-2 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-emerald-500 outline-none">
+        </div>
+
+        <div id="cameraFacingContainer" class="hidden">
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Pilih Kamera HP:</label>
+          <select id="cameraFacingMode" onchange="changeCameraFacingMode()" class="w-full px-3 py-2 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-emerald-500 outline-none">
+            <option value="user">Kamera Depan</option>
+            <option value="environment">Kamera Belakang</option>
+          </select>
+        </div>
+
+        <div class="relative bg-slate-900 rounded-xl overflow-hidden aspect-video flex items-center justify-center border shadow-inner">
+          <video id="webcamPresensi" autoplay playsinline muted class="w-full h-full object-cover"></video>
+          <div id="presensiStatus" class="absolute bottom-2 left-2 right-2 bg-black/60 text-white px-3 py-1.5 rounded-lg text-xs text-center transition-all">
+            <i class="fa-solid fa-spinner fa-spin mr-1"></i> Memuat Model Wajah...
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: REKAM WAJAH SISWA -->
+      <div id="tabContentWajah" class="max-w-md mx-auto hidden bg-white p-4 rounded-b-xl border border-t-0 space-y-4 shadow-sm no-print">
+        <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 p-2.5 rounded-lg text-xs">
+          <i class="fa-solid fa-user-plus mr-1"></i> Form Pendaftaran Master Wajah Siswa
+        </div>
+
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">1. Pilih Kelas Siswa</label>
+            <select id="kelasWajah" onchange="onKelasWajahChange()" class="w-full px-3 py-2 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-emerald-500 outline-none">
+              <option value="">-- Pilih Kelas --</option>
+              <option value="7A">Kelas 7A</option><option value="7B">Kelas 7B</option><option value="7C">Kelas 7C</option><option value="7D">Kelas 7D</option><option value="7E">Kelas 7E</option><option value="7F">Kelas 7F</option><option value="7G">Kelas 7G</option><option value="7H">Kelas 7H</option><option value="7I">Kelas 7I</option>
+              <option value="8A">Kelas 8A</option><option value="8B">Kelas 8B</option><option value="8C">Kelas 8C</option><option value="8D">Kelas 8D</option><option value="8E">Kelas 8E</option><option value="8F">Kelas 8F</option><option value="8G">Kelas 8G</option><option value="8H">Kelas 8H</option><option value="8I">Kelas 8I</option>
+              <option value="9A">Kelas 9A</option><option value="9B">Kelas 9B</option><option value="9C">Kelas 9C</option><option value="9D">Kelas 9D</option><option value="9E">Kelas 9E</option><option value="9F">Kelas 9F</option><option value="9G">Kelas 9G</option><option value="9H">Kelas 9H</option><option value="9I">Kelas 9I</option>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">2. Pilih ID Anak / NIS</label>
+              <select id="idAnakWajah" onchange="onNisWajahChange()" class="w-full px-3 py-2 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-emerald-500 outline-none">
+                <option value="">-- Pilih NIS --</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">3. Nama Lengkap (Otomatis)</label>
+              <input type="text" id="namaAnakWajah" readonly placeholder="Nama otomatis muncul" 
+                     class="w-full px-3 py-2 border rounded-lg text-sm bg-slate-100 font-semibold text-slate-700 outline-none">
+            </div>
+          </div>
+        </div>
+
+        <div class="relative bg-slate-900 rounded-xl overflow-hidden aspect-video flex items-center justify-center border">
+          <video id="webcamWajah" autoplay playsinline muted class="w-full h-full object-cover"></video>
+          <div class="absolute bottom-2 left-2 bg-black/60 text-white px-2 py-0.5 rounded text-[10px]">
+            Kamera Perekaman Wajah
+          </div>
+        </div>
+
+        <button onclick="submitRekamWajah()" id="btnSubmitWajah" 
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl text-sm transition shadow">
+          <i class="fa-solid fa-floppy-disk mr-1.5"></i> Simpan Master Wajah Siswa
+        </button>
+      </div>
+
+      <!-- TAB 3: REKAP PRESENSI -->
+      <div id="tabContentRekap" class="hidden bg-white p-4 rounded-xl border space-y-4 shadow-sm">
+        
+        <!-- HEADER MODE REKAP + TOMBOL CETAK F4 -->
+        <div class="bg-emerald-50 border border-emerald-200 p-2 rounded-xl flex items-center justify-between gap-2 no-print">
+          <div class="flex-1 flex gap-1.5">
+            <button id="btnModeList" onclick="switchRekapMode('list')" class="flex-1 py-2 rounded-lg font-bold text-xs bg-emerald-600 text-white shadow transition text-center">
+              <i class="fa-solid fa-list mr-1"></i> 1. Log Harian
+            </button>
+            <button id="btnModeMatrix" onclick="switchRekapMode('matrix')" class="flex-1 py-2 rounded-lg font-bold text-xs text-slate-700 hover:bg-emerald-100 transition text-center">
+              <i class="fa-solid fa-table-cells mr-1"></i> 2. Matrix (1–31)
+            </button>
+            <button id="btnModeSummary" onclick="switchRekapMode('summary')" class="flex-1 py-2 rounded-lg font-bold text-xs text-slate-700 hover:bg-emerald-100 transition text-center">
+              <i class="fa-solid fa-user-xmark mr-1"></i> 3. Ringkasan Tidak Sholat
+            </button>
+          </div>
+          <button onclick="cetakRekap()" class="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 rounded-lg text-xs font-bold transition shadow flex items-center shrink-0">
+            <i class="fa-solid fa-print mr-1.5"></i> Cetak F4 / PDF
+          </button>
+        </div>
+
+        <!-- HEADER KOP LAPORAN UNTUK HASIL CETAK KERTAS F4 -->
+        <div class="hidden print:block text-center border-b pb-2 mb-3">
+          <h2 class="font-bold text-base uppercase">REKAP PRESENSI SHOLAT SPENSAKA</h2>
+          <p class="text-xs uppercase">SMP NEGERI 1 KANDAT - FORMAT KERTAS F4 / FOLIO</p>
+        </div>
+
+        <!-- MODE 1: LOG DAFTAR HARIAN -->
+        <div id="viewRekapList" class="space-y-3">
+          <div class="bg-slate-50 p-3 rounded-xl border space-y-2 no-print">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-700"><i class="fa-solid fa-filter mr-1"></i> Filter Data Log Harian</span>
+              <button onclick="setTodayFilter()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded text-[11px] font-bold transition shadow">
+                <i class="fa-solid fa-calendar-day mr-1"></i> Hari Ini (Today)
+              </button>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 text-xs">
+              <div>
+                <label class="block text-[10px] text-slate-500 mb-0.5">Tanggal</label>
+                <input type="date" id="filterTanggal" onchange="renderFilteredRekap()" class="w-full px-2 py-1 border rounded bg-white outline-none">
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500 mb-0.5">Kelas</label>
+                <select id="filterKelas" onchange="renderFilteredRekap()" class="w-full px-2 py-1 border rounded bg-white outline-none">
+                  <option value="ALL">Semua Kelas</option>
+                  <option value="7A">7A</option><option value="7B">7B</option><option value="7C">7C</option><option value="7D">7D</option><option value="7E">7E</option><option value="7F">7F</option><option value="7G">7G</option><option value="7H">7H</option><option value="7I">7I</option>
+                  <option value="8A">8A</option><option value="8B">8B</option><option value="8C">8C</option><option value="8D">8D</option><option value="8E">8E</option><option value="8F">8F</option><option value="8G">8G</option><option value="8H">8H</option><option value="8I">8I</option>
+                  <option value="9A">9A</option><option value="9B">9B</option><option value="9C">9C</option><option value="9D">9D</option><option value="9E">9E</option><option value="9F">9F</option><option value="9G">9G</option><option value="9H">9H</option><option value="9I">9I</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500 mb-0.5">Sholat</label>
+                <select id="filterSholat" onchange="renderFilteredRekap()" class="w-full px-2 py-1 border rounded bg-white outline-none">
+                  <option value="ALL">Semua</option>
+                  <option value="Dhuha">Dhuha</option><option value="Dzuhur">Dzuhur</option><option value="Jumat">Jumat</option>
+                  <option value="Istighosah">Istighosah</option><option value="Maulid Nabi">Maulid Nabi</option>
+                  <option value="Idul Adha">Idul Adha</option><option value="Haid">Haid</option><option value="Lainnya">Lainnya</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-center text-[10px] pt-1">
+              <span id="rekapCountLabel" class="font-bold text-emerald-800">Menampilkan 0 data</span>
+              <button onclick="resetRekapFilter()" class="text-red-500 hover:underline">Reset Filter</button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto border rounded-lg">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="bg-slate-100 text-slate-600 border-b">
+                  <th class="p-2">Waktu</th>
+                  <th class="p-2">Kelas</th>
+                  <th class="p-2">NIS & Nama</th>
+                  <th class="p-2">Sholat</th>
+                </tr>
+              </thead>
+              <tbody id="rekapTableBody">
+                <tr><td colspan="4" class="p-4 text-center text-slate-400">Memuat data...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- MODE 2: MATRIX BULANAN TANGGAL 1-31 -->
+        <div id="viewRekapMatrix" class="hidden space-y-3">
+          <div class="bg-slate-50 p-3 rounded-xl border space-y-2 no-print">
+            <div class="font-bold text-xs text-slate-700"><i class="fa-solid fa-filter mr-1"></i> Filter Matrix Bulanan (Tanggal 1–31)</div>
+            <div class="grid grid-cols-4 gap-2 text-xs">
+              <div>
+                <label class="block text-[10px] text-slate-500 mb-0.5">Bulan</label>
+                <select id="matrixBulan" onchange="renderMatrixBulanan()" class="w-full px-2 py-1 border rounded bg-white outline-none font-semibold">
+                  <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
+                  <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
+                  <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
+                  <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500 mb-0.5">Tahun</label>
+                <select id="matrixTahun" onchange="renderMatrixBulanan()" class="w-full px-2 py-1 border rounded bg-white outline-none font-semibold">
+                  <option value="2026">2026</option>
+                  <option value="2025">2025</option>
+                  <option value="2024">2024</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500 mb-0.5">Kelas</label>
+                <select id="matrixKelas" onchange="renderMatrixBulanan()" class="w-full px-2 py-1 border rounded bg-white outline-none font-semibold">
+                  <option value="7A">7A</option><option value="7B">7B</option><option value="7C">7C</option><option value="7D">7D</option><option value="7E">7E</option><option value="7F">7F</option><option value="7G">7G</option><option value="7H">7H</option><option value="7I">7I</option>
+                  <option value="8A">8A</option><option value="8B">8B</option><option value="8C">8C</option><option value="8D">8D</option><option value="8E">8E</option><option value="8F">8F</option><option value="8G">8G</option><option value="8H">8H</option><option value="8I">8I</option>
+                  <option value="9A">9A</option><option value="9B">9B</option><option value="9C">9C</option><option value="9D">9D</option><option value="9E">9E</option><option value="9F">9F</option><option value="9G">9G</option><option value="9H">9H</option><option value="9I">9I</option>
+                  <option value="ALL">Semua Kelas</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500 mb-0.5">Jenis Sholat</label>
+                <select id="matrixSholat" onchange="renderMatrixBulanan()" class="w-full px-2 py-1 border rounded bg-white outline-none font-semibold">
+                  <option value="Dzuhur">Dzuhur</option>
+                  <option value="Dhuha">Dhuha</option>
+                  <option value="Jumat">Jumat</option>
+                  <option value="Istighosah">Istighosah</option>
+                  <option value="Maulid Nabi">Maulid Nabi</option>
+                  <option value="Idul Adha">Idul Adha</option>
+                  <option value="Haid">Haid</option>
+                  <option value="ALL">Semua Jenis Sholat</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="border rounded-xl bg-white p-3 space-y-2 shadow-sm overflow-hidden">
+            <div class="text-xs space-y-0.5 font-bold text-slate-700 border-b pb-2 flex justify-between items-center">
+              <div>
+                <p>Bulan: <span id="labelMatrixBulan" class="text-emerald-700 font-extrabold">-</span></p>
+                <p>Jenis: <span id="labelMatrixJenis" class="text-emerald-700 font-extrabold">-</span></p>
+              </div>
+              <div id="matrixTotalSiswa" class="font-bold text-slate-700 text-[11px]">Total: 0 Siswa</div>
+            </div>
+
+            <div class="overflow-x-auto max-h-[500px]">
+              <table id="tableMatrixBulanan" class="w-full text-center text-[10px] border-collapse border border-slate-300">
+                <thead id="matrixHeader" class="bg-slate-100 text-slate-700 sticky top-0 border-b border-slate-300">
+                  <!-- Header 1..31 -->
+                </thead>
+                <tbody id="matrixBody">
+                  <!-- Baris siswa -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="text-[10px] text-slate-600 pt-1 flex flex-wrap gap-3 no-print">
+              <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-emerald-100 border border-emerald-300 inline-block"></span> <b>Sholat</b> (Hadir)</span>
+              <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-rose-100 border border-rose-300 inline-block"></span> <b>Haid</b> (Berhalangan)</span>
+              <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-red-100 border border-red-300 inline-block"></span> <b class="text-red-700">Tidak</b> (Tidak Sholat saat ada jadwal)</span>
+              <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-slate-100 border inline-block"></span> <b>-</b> (Tidak Ada Jadwal / Libur)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- MODE 3: RINGKASAN REKAP TIDAK SHOLAT / ALPHA -->
+        <div id="viewRekapSummary" class="hidden space-y-3">
+          <div class="bg-slate-50 p-3 rounded-xl border space-y-2 no-print">
+            <div class="font-bold text-xs text-slate-700"><i class="fa-solid fa-filter mr-1"></i> Filter Ringkasan Tidak Sholat</div>
+            <div class="grid grid-cols-4 gap-2 text-xs">
+              <div>
+                <label class="block text-[10px] text-slate-500 mb-0.5">Bulan</label>
+                <select id="summaryBulan" onchange="renderRingkasanTidakSholat()" class="w-full px-2 py-1 border rounded bg-white outline-none font-semibold">
+                  <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option>
+                  <option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option>
+                  <option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option>
+                  <option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500 mb-0.5">Tahun</label>
+                <select id="summaryTahun" onchange="renderRingkasanTidakSholat()" class="w-full px-2 py-1 border rounded bg-white outline-none font-semibold">
+                  <option value="2026">2026</option>
+                  <option value="2025">2025</option>
+                  <option value="2024">2024</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500 mb-0.5">Kelas</label>
+                <select id="summaryKelas" onchange="renderRingkasanTidakSholat()" class="w-full px-2 py-1 border rounded bg-white outline-none font-semibold">
+                  <option value="ALL">Semua Kelas</option>
+                  <option value="7A">7A</option><option value="7B">7B</option><option value="7C">7C</option><option value="7D">7D</option><option value="7E">7E</option><option value="7F">7F</option><option value="7G">7G</option><option value="7H">7H</option><option value="7I">7I</option>
+                  <option value="8A">8A</option><option value="8B">8B</option><option value="8C">8C</option><option value="8D">8D</option><option value="8E">8E</option><option value="8F">8F</option><option value="8G">8G</option><option value="8H">8H</option><option value="8I">8I</option>
+                  <option value="9A">9A</option><option value="9B">9B</option><option value="9C">9C</option><option value="9D">9D</option><option value="9E">9E</option><option value="9F">9F</option><option value="9G">9G</option><option value="9H">9H</option><option value="9I">9I</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500 mb-0.5">Jenis Sholat</label>
+                <select id="summarySholat" onchange="renderRingkasanTidakSholat()" class="w-full px-2 py-1 border rounded bg-white outline-none font-semibold">
+                  <option value="Dzuhur">Dzuhur</option>
+                  <option value="Dhuha">Dhuha</option>
+                  <option value="Jumat">Jumat</option>
+                  <option value="Istighosah">Istighosah</option>
+                  <option value="Maulid Nabi">Maulid Nabi</option>
+                  <option value="Idul Adha">Idul Adha</option>
+                  <option value="Haid">Haid</option>
+                  <option value="ALL">Semua Jenis Sholat</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="border rounded-xl bg-white p-3 space-y-2 shadow-sm overflow-hidden">
+            <div class="text-xs space-y-0.5 font-bold text-slate-700 border-b pb-2 flex justify-between items-center">
+              <div>
+                <p>Bulan: <span id="labelSummaryBulan" class="text-emerald-700 font-extrabold">-</span></p>
+                <p>Jenis: <span id="labelSummaryJenis" class="text-emerald-700 font-extrabold">-</span></p>
+              </div>
+              <div id="summaryTotalSiswa" class="font-bold text-slate-700 text-[11px]">Total: 0 Siswa</div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="bg-slate-100 text-slate-700 border-b">
+                    <th class="p-2 text-center">No</th>
+                    <th class="p-2 text-center">NIS</th>
+                    <th class="p-2">Nama Siswa</th>
+                    <th class="p-2 text-center">L/P</th>
+                    <th class="p-2 text-center">Kelas</th>
+                    <th class="p-2 text-center">Hari Sholat</th>
+                    <th class="p-2 text-center">Hadir Sholat</th>
+                    <th class="p-2 text-center">Haid</th>
+                    <th class="p-2 text-center text-red-600 font-bold">Tidak Sholat</th>
+                    <th class="p-2">Tanggal Tidak Sholat</th>
+                  </tr>
+                </thead>
+                <tbody id="summaryTableBody">
+                  <tr><td colspan="10" class="p-4 text-center text-slate-400">Memuat ringkasan...</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="text-[10px] text-slate-500 pt-1 no-print">
+              <span><i class="fa-solid fa-circle-info mr-1"></i> Tanggal Tidak Sholat dihitung otomatis apabila pada tanggal tersebut mayoritas siswa di kelas terekam Sholat/Haid.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TAB 4: KELOLA USER (ADMIN) -->
+      <div id="tabContentUsers" class="max-w-md mx-auto hidden bg-white p-4 rounded-b-xl border border-t-0 space-y-4 shadow-sm no-print">
+        <h3 class="font-bold text-sm text-slate-700">Tambah Akun Pengguna Baru</h3>
+        
+        <form onsubmit="handleTambahUser(event)" class="space-y-3 bg-slate-50 p-3 rounded-xl border">
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Username</label>
+            <input type="text" id="newUsername" required placeholder="Username login" class="w-full px-2.5 py-1.5 border rounded text-xs bg-white">
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Password</label>
+            <input type="password" id="newPassword" required placeholder="Password" class="w-full px-2.5 py-1.5 border rounded text-xs bg-white">
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Nama Lengkap</label>
+            <input type="text" id="newNama" required placeholder="Nama pemilik akun" class="w-full px-2.5 py-1.5 border rounded text-xs bg-white">
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Role / Peran</label>
+            <select id="newRole" class="w-full px-2.5 py-1.5 border rounded text-xs bg-white">
+              <option value="Admin">Admin</option>
+              <option value="Guru">Guru</option>
+              <option value="Wali Kelas">Wali Kelas</option>
+              <option value="Petugas">Petugas</option>
+            </select>
+          </div>
+          <button type="submit" id="btnTambahUser" class="w-full bg-emerald-600 text-white font-semibold py-2 rounded text-xs">
+            <i class="fa-solid fa-plus mr-1"></i> Tambah User Baru
+          </button>
+        </form>
+
+        <div class="space-y-2">
+          <h4 class="font-bold text-xs text-slate-700">Daftar Akun Terdaftar</h4>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="bg-slate-100 text-slate-600 border-b">
+                  <th class="p-2">User</th>
+                  <th class="p-2">Nama</th>
+                  <th class="p-2">Role</th>
+                </tr>
+              </thead>
+              <tbody id="userTableBody">
+                <tr><td colspan="3" class="p-3 text-center text-slate-400">Memuat user...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyspwEcsUFbIS9jq_2xL_XLo-0_fCExHy9Q86Ws8pWBs4Jp20HacC8ufwADhXCi4y1Z/exec";
+    const MODEL_URL = "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/";
+
+    let currentUser = null;
+    let videoStream = null;
+    let faceMatcher = null;
+    let isModelsLoaded = false;
+    let presensiInterval = null;
+    let isProcessingPresensi = false;
+    let lastPresensiTime = {};
+    let currentTab = 'presensi';
+    let currentRekapMode = 'list';
+    let rawRekapData = [];
+    let allSiswaList = [];
+    let allMasterDescriptors = [];
+
+    const namaBulanMap = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    const isMobile = /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    function cetakRekap() {
+      window.print();
+    }
+
+    async function postToGoogleSheets(payload) {
+      const response = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+      return await response.json();
+    }
+
+    async function loadModels() {
+      try {
+        await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+        await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+        await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+        isModelsLoaded = true;
+      } catch(e) {
+        console.error("Gagal load model AI:", e);
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('loginUsername').value;
+      const password = document.getElementById('loginPassword').value;
+      const btn = document.getElementById('btnLogin');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Memeriksa...';
+
+      try {
+        const result = await postToGoogleSheets({ action: "login", username, password });
+
+        if (result.status === 'success') {
+          currentUser = result.user;
+          localStorage.setItem('spensaka_app_user', JSON.stringify(currentUser));
+          initDashboard();
+        } else {
+          alert(result.message);
+        }
+      } catch (err) {
+        alert("Gagal terhubung ke Google Sheets.");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket mr-1.5"></i> Buka Aplikasi';
+      }
+    }
+
+    function checkRolePermissions() {
+      if (!currentUser || !currentUser.role) return { wajah: false, rekap: false, users: false };
+      const role = currentUser.role.toString().trim().toLowerCase();
+
+      if (role === 'admin') {
+        return { wajah: true, rekap: true, users: true };
+      } else if (role === 'wali kelas' || role === 'walikelas' || role === 'wali_kelas') {
+        return { wajah: true, rekap: true, users: false };
+      } else if (role === 'guru') {
+        return { wajah: false, rekap: true, users: false };
+      } else if (role === 'petugas') {
+        return { wajah: false, rekap: false, users: false };
+      }
+      return { wajah: false, rekap: false, users: false };
+    }
+
+    function applyRolePermissions() {
+      const p = checkRolePermissions();
+      document.getElementById('tabBtnWajah').style.display = p.wajah ? '' : 'none';
+      document.getElementById('tabBtnRekap').style.display = p.rekap ? '' : 'none';
+      document.getElementById('tabBtnUsers').style.display = p.users ? '' : 'none';
+    }
+
+    async function initDashboard() {
+      document.getElementById('loginView').classList.add('hidden');
+      document.getElementById('dashboardView').classList.remove('hidden');
+      document.getElementById('userLabel').innerText = currentUser.nama;
+      document.getElementById('roleBadge').innerText = currentUser.role;
+
+      if (isMobile) {
+        document.getElementById('cameraFacingContainer').classList.remove('hidden');
+      }
+
+      applyRolePermissions();
+
+      const now = new Date();
+      const currentMonthStr = (now.getMonth() + 1).toString();
+      const currentYearStr = now.getFullYear().toString();
+
+      document.getElementById('matrixBulan').value = currentMonthStr;
+      document.getElementById('matrixTahun').value = currentYearStr;
+      
+      if (document.getElementById('summaryBulan')) {
+        document.getElementById('summaryBulan').value = currentMonthStr;
+        document.getElementById('summaryTahun').value = currentYearStr;
+      }
+
+      if (!isModelsLoaded) await loadModels();
+      await syncMasterWajah();
+      switchTab('presensi');
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('spensaka_app_user');
+      currentUser = null;
+      stopCamera();
+      if (presensiInterval) clearInterval(presensiInterval);
+      document.getElementById('dashboardView').classList.add('hidden');
+      document.getElementById('loginView').classList.remove('hidden');
+    }
+
+    function toggleJenisSholatLainnya() {
+      const val = document.getElementById('jenisSholat').value;
+      const container = document.getElementById('containerSholatLainnya');
+      if (val === 'Lainnya') {
+        container.classList.remove('hidden');
+      } else {
+        container.classList.add('hidden');
+      }
+    }
+
+    function getSelectedJenisSholat() {
+      const val = document.getElementById('jenisSholat').value;
+      if (val === 'Lainnya') {
+        const customText = document.getElementById('inputSholatLainnya').value.trim();
+        return customText !== '' ? customText : 'Lainnya';
+      }
+      return val;
+    }
+
+    async function syncMasterWajah() {
+      try {
+        const result = await postToGoogleSheets({ action: "get_master_wajah" });
+        if (result.status === 'success' && result.data.length > 0) {
+          allSiswaList = result.data;
+
+          allMasterDescriptors = result.data.map(item => {
+            try {
+              if (item.vectorWajah && item.vectorWajah.length > 20) {
+                const vec = JSON.parse(item.vectorWajah);
+                if (Array.isArray(vec) && vec.length === 128) {
+                  return {
+                    kelas: (item.kelas || '').toString().trim().toUpperCase(),
+                    descriptor: new faceapi.LabeledFaceDescriptors(
+                      `${item.idAnak}___${item.namaAnak}___${item.kelas || '-'}`,
+                      [new Float32Array(vec)]
+                    )
+                  };
+                }
+              }
+            } catch(e) {}
+            return null;
+          }).filter(x => x !== null);
+
+          updatePresensiFaceMatcher();
+          onKelasWajahChange();
+        }
+      } catch(e) {
+        console.error("Gagal sync master wajah:", e);
+      }
+    }
+
+    function updatePresensiFaceMatcher() {
+      const selectElem = document.getElementById('kelasPresensi');
+      const selectedKelas = selectElem ? selectElem.value : 'ALL';
+
+      let filteredItems = allMasterDescriptors;
+      if (selectedKelas !== 'ALL') {
+        filteredItems = allMasterDescriptors.filter(item => item.kelas === selectedKelas.trim().toUpperCase());
+      }
+
+      const listDescriptors = filteredItems.map(item => item.descriptor);
+
+      if (listDescriptors.length > 0) {
+        // PERKETAT DISTANCE THRESHOLD KE 0.32 UNTUK BEBAS AKURAT
+        faceMatcher = new faceapi.FaceMatcher(listDescriptors, 0.32);
+      } else {
+        faceMatcher = null;
+      }
+    }
+
+    function onKelasWajahChange() {
+      const selectedKelas = document.getElementById('kelasWajah').value;
+      const selectNis = document.getElementById('idAnakWajah');
+      const inputNama = document.getElementById('namaAnakWajah');
+
+      selectNis.innerHTML = '<option value="">-- Pilih NIS --</option>';
+      inputNama.value = '';
+
+      if (!selectedKelas) return;
+
+      const filteredSiswa = allSiswaList.filter(s => s.kelas.toString().trim().toUpperCase() === selectedKelas.trim().toUpperCase());
+
+      filteredSiswa.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.idAnak;
+        const isRecorded = (s.vectorWajah && s.vectorWajah.length > 20) ? ' [✓ Selesai]' : '';
+        opt.textContent = `${s.idAnak} - ${s.namaAnak}${isRecorded}`;
+        selectNis.appendChild(opt);
+      });
+    }
+
+    function onNisWajahChange() {
+      const selectedNis = document.getElementById('idAnakWajah').value;
+      const inputNama = document.getElementById('namaAnakWajah');
+
+      if (!selectedNis) {
+        inputNama.value = '';
+        return;
+      }
+
+      const found = allSiswaList.find(s => s.idAnak.toString().trim() === selectedNis.trim());
+      if (found) {
+        inputNama.value = found.namaAnak;
+      } else {
+        inputNama.value = '';
+      }
+    }
+
+    async function startCamera(elementId) {
+      stopCamera();
+
+      let facingModeValue = 'user';
+      if (isMobile) {
+        const facingSelect = document.getElementById('cameraFacingMode');
+        if (facingSelect) facingModeValue = facingSelect.value;
+      }
+
+      try {
+        videoStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: facingModeValue } }
+        });
+        document.getElementById(elementId).srcObject = videoStream;
+      } catch (err) {
+        try {
+          videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
+          document.getElementById(elementId).srcObject = videoStream;
+        } catch(e) {
+          console.log("Kamera tidak aktif.");
+        }
+      }
+    }
+
+    function changeCameraFacingMode() {
+      if (currentTab === 'presensi') {
+        startCamera('webcamPresensi').then(() => startAutoPresensiLoop());
+      } else if (currentTab === 'wajah') {
+        startCamera('webcamWajah');
+      }
+    }
+
+    function stopCamera() {
+      if (videoStream) {
+        videoStream.getTracks().forEach(track => track.stop());
+      }
+      if (presensiInterval) clearInterval(presensiInterval);
+    }
+
+    function startAutoPresensiLoop() {
+      if (presensiInterval) clearInterval(presensiInterval);
+
+      presensiInterval = setInterval(async () => {
+        if (isProcessingPresensi || currentTab !== 'presensi') return;
+
+        const video = document.getElementById('webcamPresensi');
+        const statusDiv = document.getElementById('presensiStatus');
+
+        if (!video || video.paused || video.ended || !isModelsLoaded) return;
+
+        if (!faceMatcher) {
+          statusDiv.className = "absolute bottom-2 left-2 right-2 bg-amber-600/90 text-white px-3 py-1.5 rounded-lg text-xs text-center";
+          statusDiv.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> Data Wajah untuk kelas ini kosong / belum direkam.`;
+          return;
+        }
+
+        try {
+          // RESOLUSI PINDAI 416 & SCORE THRESHOLD 0.65
+          const detection = await faceapi.detectSingleFace(
+            video, 
+            new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.65 })
+          ).withFaceLandmarks().withFaceDescriptor();
+
+          if (detection) {
+            const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
+
+            if (bestMatch.label !== 'unknown') {
+              const [idAnak, namaAnak, kelas] = bestMatch.label.split('___');
+              const now = Date.now();
+
+              if (!lastPresensiTime[idAnak] || (now - lastPresensiTime[idAnak] > 10000)) {
+                isProcessingPresensi = true;
+                lastPresensiTime[idAnak] = now;
+
+                statusDiv.className = "absolute bottom-2 left-2 right-2 bg-emerald-600/95 text-white px-3 py-1.5 rounded-lg text-xs font-bold text-center animate-pulse shadow";
+                statusDiv.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> Terdeteksi: ${namaAnak} (${kelas}) - Menyimpan...`;
+
+                const jenisSholatSelected = getSelectedJenisSholat();
+                const result = await postToGoogleSheets({
+                  action: "simpan_presensi",
+                  idAnak: idAnak,
+                  namaAnak: namaAnak,
+                  kelas: kelas,
+                  jenisSholat: jenisSholatSelected
+                });
+
+                if (result.status === 'success') {
+                  statusDiv.className = "absolute bottom-2 left-2 right-2 bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold text-center shadow";
+                  statusDiv.innerHTML = `<i class="fa-solid fa-check-double mr-1"></i> Berhasil Presensi: ${namaAnak} (${kelas})`;
+                }
+                setTimeout(() => { isProcessingPresensi = false; }, 2000);
+              } else {
+                statusDiv.className = "absolute bottom-2 left-2 right-2 bg-blue-600/90 text-white px-3 py-1.5 rounded-lg text-xs font-bold text-center";
+                statusDiv.innerHTML = `<i class="fa-solid fa-clock mr-1"></i> ${namaAnak} (${kelas}) Sudah Presensi`;
+              }
+            } else {
+              statusDiv.className = "absolute bottom-2 left-2 right-2 bg-black/60 text-white px-3 py-1.5 rounded-lg text-xs text-center";
+              statusDiv.innerHTML = `<i class="fa-solid fa-face-rolling-eyes mr-1"></i> Wajah tidak cocok / tidak di kelas ini`;
+            }
+          } else {
+            statusDiv.className = "absolute bottom-2 left-2 right-2 bg-black/60 text-white px-3 py-1.5 rounded-lg text-xs text-center";
+            statusDiv.innerHTML = `<i class="fa-solid fa-camera mr-1"></i> Posisikan wajah di depan kamera...`;
+          }
+        } catch (e) {
+          console.error("Presensi loop error:", e);
+        }
+      }, 600);
+    }
+
+    async function submitRekamWajah() {
+      const kelas = document.getElementById('kelasWajah').value;
+      const idAnak = document.getElementById('idAnakWajah').value;
+      const namaAnak = document.getElementById('namaAnakWajah').value;
+      const video = document.getElementById('webcamWajah');
+      const btn = document.getElementById('btnSubmitWajah');
+
+      if (!kelas) {
+        alert("Harap pilih Kelas siswa terlebih dahulu!");
+        return;
+      }
+      if (!idAnak || !namaAnak) {
+        alert("Harap pilih ID Anak / NIS terlebih dahulu!");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Memindai Wajah...';
+
+      try {
+        const detection = await faceapi.detectSingleFace(
+          video, 
+          new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.70 })
+        ).withFaceLandmarks().withFaceDescriptor();
+
+        if (!detection) {
+          alert("Wajah tidak terdeteksi presisi! Pastikan posisi wajah tegak dan cahaya cukup.");
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-floppy-disk mr-1.5"></i> Simpan Master Wajah Siswa';
+          return;
+        }
+
+        const vectorArray = Array.from(detection.descriptor);
+        const vectorWajahStr = JSON.stringify(vectorArray);
+
+        const result = await postToGoogleSheets({
+          action: "simpan_wajah",
+          idAnak: idAnak,
+          namaAnak: namaAnak,
+          kelas: kelas,
+          vectorWajah: vectorWajahStr
+        });
+
+        if (result.status === 'success') {
+          alert("Sukses! Master Wajah " + namaAnak + " (" + kelas + ") berhasil direkam.");
+          document.getElementById('idAnakWajah').value = '';
+          document.getElementById('namaAnakWajah').value = '';
+          await syncMasterWajah();
+        } else {
+          alert("Gagal: " + result.message);
+        }
+      } catch (err) {
+        alert("Gagal merekam data wajah.");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-floppy-disk mr-1.5"></i> Simpan Master Wajah Siswa';
+      }
+    }
+
+    async function loadRekap() {
+      const tbody = document.getElementById('rekapTableBody');
+      tbody.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Memuat data...</td></tr>';
+      
+      if (allSiswaList.length === 0) {
+        await syncMasterWajah();
+      }
+
+      try {
+        const result = await postToGoogleSheets({ action: "get_rekap" });
+        if (result.status === 'success' && result.data) {
+          rawRekapData = result.data;
+          if (currentRekapMode === 'list') {
+            renderFilteredRekap();
+          } else if (currentRekapMode === 'matrix') {
+            renderMatrixBulanan();
+          } else if (currentRekapMode === 'summary') {
+            renderRingkasanTidakSholat();
+          }
+        } else {
+          tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400">Belum ada data presensi.</td></tr>';
+        }
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-red-400">Gagal mengambil rekap data.</td></tr>';
+      }
+    }
+
+    function switchRekapMode(mode) {
+      currentRekapMode = mode;
+      const btnList = document.getElementById('btnModeList');
+      const btnMatrix = document.getElementById('btnModeMatrix');
+      const btnSummary = document.getElementById('btnModeSummary');
+
+      const viewList = document.getElementById('viewRekapList');
+      const viewMatrix = document.getElementById('viewRekapMatrix');
+      const viewSummary = document.getElementById('viewRekapSummary');
+
+      const activeClass = "flex-1 py-2 rounded-lg font-bold text-xs bg-emerald-600 text-white shadow transition text-center";
+      const inactiveClass = "flex-1 py-2 rounded-lg font-bold text-xs text-slate-700 hover:bg-emerald-100 transition text-center";
+
+      btnList.className = inactiveClass;
+      btnMatrix.className = inactiveClass;
+      btnSummary.className = inactiveClass;
+
+      viewList.classList.add('hidden');
+      viewMatrix.classList.add('hidden');
+      viewSummary.classList.add('hidden');
+
+      if (mode === 'list') {
+        btnList.className = activeClass;
+        viewList.classList.remove('hidden');
+        renderFilteredRekap();
+      } else if (mode === 'matrix') {
+        btnMatrix.className = activeClass;
+        viewMatrix.classList.remove('hidden');
+        renderMatrixBulanan();
+      } else if (mode === 'summary') {
+        btnSummary.className = activeClass;
+        viewSummary.classList.remove('hidden');
+        renderRingkasanTidakSholat();
+      }
+    }
+
+    function renderFilteredRekap() {
+      const filterTanggal = document.getElementById('filterTanggal').value;
+      const filterKelas = document.getElementById('filterKelas').value;
+      const filterSholat = document.getElementById('filterSholat').value;
+
+      const deduplicatedData = [];
+      const seenKeys = new Set();
+
+      for (const item of rawRekapData) {
+        const itemDate = item.waktu ? item.waktu.substring(0, 10) : '';
+        const key = `${item.idAnak}_${itemDate}_${item.jenisSholat}`;
+
+        if (!seenKeys.has(key)) {
+          seenKeys.add(key);
+          deduplicatedData.push(item);
+        }
+      }
+
+      const filtered = deduplicatedData.filter(item => {
+        const itemDate = item.waktu ? item.waktu.substring(0, 10) : '';
+
+        if (filterTanggal && itemDate !== filterTanggal) return false;
+        if (filterKelas !== 'ALL' && item.kelas !== filterKelas) return false;
+
+        if (filterSholat !== 'ALL') {
+          if (filterSholat === 'Lainnya') {
+            const standardOptions = ['Dhuha', 'Dzuhur', 'Jumat', 'Istighosah', 'Maulid Nabi', 'Idul Adha', 'Haid'];
+            if (standardOptions.includes(item.jenisSholat)) return false;
+          } else if (item.jenisSholat !== filterSholat) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+
+      const tbody = document.getElementById('rekapTableBody');
+      document.getElementById('rekapCountLabel').innerText = `Menampilkan ${filtered.length} data`;
+
+      if (filtered.length > 0) {
+        tbody.innerHTML = filtered.map(item => `
+          <tr class="border-b hover:bg-slate-50 text-[11px]">
+            <td class="p-2 font-mono text-slate-500">${item.waktu}</td>
+            <td class="p-2"><span class="bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded font-bold">${item.kelas || '-'}</span></td>
+            <td class="p-2 font-semibold text-slate-700">${item.namaAnak} <span class="text-slate-400">(${item.idAnak})</span></td>
+            <td class="p-2"><span class="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-medium border border-emerald-200">${item.jenisSholat}</span></td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400">Data tidak ditemukan sesuai filter.</td></tr>';
+      }
+    }
+
+    function renderMatrixBulanan() {
+      const bulanInt = parseInt(document.getElementById('matrixBulan').value);
+      const tahunInt = parseInt(document.getElementById('matrixTahun').value);
+      const selectedKelas = document.getElementById('matrixKelas').value;
+      const selectedSholat = document.getElementById('matrixSholat').value;
+
+      document.getElementById('labelMatrixBulan').innerText = `${namaBulanMap[bulanInt]} ${tahunInt}`;
+      document.getElementById('labelMatrixJenis').innerText = selectedSholat === 'ALL' ? 'Semua Sholat' : selectedSholat;
+
+      const totalHariBulan = new Date(tahunInt, bulanInt, 0).getDate();
+
+      let targetSiswa = allSiswaList;
+      if (selectedKelas !== 'ALL') {
+        targetSiswa = allSiswaList.filter(s => (s.kelas || '').toString().trim().toUpperCase() === selectedKelas.trim().toUpperCase());
+      }
+
+      document.getElementById('matrixTotalSiswa').innerText = `Total: ${targetSiswa.length} Siswa`;
+
+      const presensiMap = {};
+
+      rawRekapData.forEach(item => {
+        if (!item.waktu) return;
+        
+        const dateStr = item.waktu.toString().split(' ')[0];
+        const parts = dateStr.split('-');
+        if (parts.length < 3) return;
+
+        const y = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10);
+        const d = parseInt(parts[2], 10);
+
+        if (y === tahunInt && m === bulanInt) {
+          const studentId = item.idAnak ? item.idAnak.toString().trim() : '';
+          if (!studentId) return;
+
+          if (!presensiMap[studentId]) presensiMap[studentId] = {};
+          if (!presensiMap[studentId][d]) presensiMap[studentId][d] = {};
+          
+          const sholatName = item.jenisSholat ? item.jenisSholat.toString().trim() : '';
+          presensiMap[studentId][d][sholatName] = sholatName;
+        }
+      });
+
+      const classPrayerDays = {};
+      const allClassNames = [...new Set(allSiswaList.map(s => (s.kelas || '').toString().trim().toUpperCase()))];
+
+      allClassNames.forEach(kName => {
+        if (!kName) return;
+        classPrayerDays[kName] = {};
+        const classStudentsCount = allSiswaList.filter(s => (s.kelas || '').toString().trim().toUpperCase() === kName).length || 1;
+
+        for (let h = 1; h <= totalHariBulan; h++) {
+          const setAttended = new Set();
+          rawRekapData.forEach(item => {
+            if (!item.waktu) return;
+            const dateStr = item.waktu.toString().split(' ')[0];
+            const parts = dateStr.split('-');
+            if (parts.length < 3) return;
+            if (parseInt(parts[0], 10) === tahunInt && parseInt(parts[1], 10) === bulanInt && parseInt(parts[2], 10) === h) {
+              if ((item.kelas || '').toString().trim().toUpperCase() === kName) {
+                const itemSholat = (item.jenisSholat || '').toString().trim();
+                if (selectedSholat === 'ALL' || itemSholat === selectedSholat || itemSholat === 'Haid') {
+                  if (item.idAnak) setAttended.add(item.idAnak.toString().trim());
+                }
+              }
+            }
+          });
+          const minThreshold = Math.max(2, Math.ceil(classStudentsCount * 0.25));
+          classPrayerDays[kName][h] = setAttended.size >= minThreshold;
+        }
+      });
+
+      const headerThead = document.getElementById('matrixHeader');
+      let thHTML = `<tr class="border-b border-slate-300">
+        <th class="p-1.5 border-r min-w-[30px]">No</th>
+        <th class="p-1.5 border-r min-w-[60px]">ID Anak/NIS</th>
+        <th class="p-1.5 border-r min-w-[70px]">NISN</th>
+        <th class="p-1.5 border-r text-left min-w-[150px]">Nama Anak</th>
+        <th class="p-1.5 border-r min-w-[30px]">L/P</th>
+        <th class="p-1.5 border-r min-w-[40px]">Kelas</th>`;
+
+      for (let h = 1; h <= totalHariBulan; h++) {
+        thHTML += `<th class="p-1 border-r min-w-[32px]">${h}</th>`;
+      }
+      thHTML += `</tr>`;
+      headerThead.innerHTML = thHTML;
+
+      const bodyTbody = document.getElementById('matrixBody');
+      if (targetSiswa.length === 0) {
+        bodyTbody.innerHTML = `<tr><td colspan="${6 + totalHariBulan}" class="p-4 text-center text-slate-400">Tidak ada data siswa untuk kelas ini.</td></tr>`;
+        return;
+      }
+
+      let bodyHTML = '';
+      targetSiswa.forEach((s, idx) => {
+        const sId = s.idAnak ? s.idAnak.toString().trim() : '';
+        const sKelas = (s.kelas || '').toString().trim().toUpperCase();
+
+        bodyHTML += `<tr class="border-b hover:bg-slate-50 border-slate-200">
+          <td class="p-1 border-r font-mono text-center">${s.no || (idx + 1)}</td>
+          <td class="p-1 border-r font-mono text-center">${sId}</td>
+          <td class="p-1 border-r font-mono text-slate-500 text-center">${s.nisn || '-'}</td>
+          <td class="p-1 border-r font-semibold text-left text-slate-800 whitespace-nowrap">${s.namaAnak}</td>
+          <td class="p-1 border-r text-center">${s.lp || '-'}</td>
+          <td class="p-1 border-r font-bold text-slate-600 text-center">${s.kelas}</td>`;
+
+        for (let h = 1; h <= totalHariBulan; h++) {
+          let val = '-';
+          let bgClass = 'text-slate-400';
+          const dayData = (presensiMap[sId] && presensiMap[sId][h]) ? presensiMap[sId][h] : null;
+
+          if (dayData) {
+            if (selectedSholat === 'ALL') {
+              const keys = Object.keys(dayData);
+              if (keys.length > 0) val = keys.join(', ');
+            } else {
+              if (dayData[selectedSholat]) {
+                val = selectedSholat;
+              } else if (dayData['Haid']) {
+                val = 'Haid';
+              }
+            }
+          }
+
+          if (val !== '-') {
+            if (val === 'Haid') {
+              bgClass = 'bg-rose-100 text-rose-800 font-bold';
+            } else {
+              bgClass = 'bg-emerald-100 text-emerald-800 font-bold';
+            }
+          } else {
+            const isPrayerDay = classPrayerDays[sKelas] && classPrayerDays[sKelas][h];
+            if (isPrayerDay) {
+              val = 'Tidak';
+              bgClass = 'bg-red-100 text-red-700 font-bold';
+            } else {
+              val = '-';
+              bgClass = 'text-slate-300';
+            }
+          }
+
+          bodyHTML += `<td class="p-1 border-r text-[9px] text-center ${bgClass}">${val}</td>`;
+        }
+
+        bodyHTML += `</tr>`;
+      });
+
+      bodyTbody.innerHTML = bodyHTML;
+    }
+
+    function renderRingkasanTidakSholat() {
+      const bulanInt = parseInt(document.getElementById('summaryBulan').value);
+      const tahunInt = parseInt(document.getElementById('summaryTahun').value);
+      const selectedKelas = document.getElementById('summaryKelas').value;
+      const selectedSholat = document.getElementById('summarySholat').value;
+
+      document.getElementById('labelSummaryBulan').innerText = `${namaBulanMap[bulanInt]} ${tahunInt}`;
+      document.getElementById('labelSummaryJenis').innerText = selectedSholat === 'ALL' ? 'Semua Sholat' : selectedSholat;
+
+      const totalHariBulan = new Date(tahunInt, bulanInt, 0).getDate();
+
+      let targetSiswa = allSiswaList;
+      if (selectedKelas !== 'ALL') {
+        targetSiswa = allSiswaList.filter(s => (s.kelas || '').toString().trim().toUpperCase() === selectedKelas.trim().toUpperCase());
+      }
+
+      const presensiMap = {};
+      rawRekapData.forEach(item => {
+        if (!item.waktu) return;
+        const dateStr = item.waktu.toString().split(' ')[0];
+        const parts = dateStr.split('-');
+        if (parts.length < 3) return;
+        const y = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10);
+        const d = parseInt(parts[2], 10);
+
+        if (y === tahunInt && m === bulanInt) {
+          const studentId = item.idAnak ? item.idAnak.toString().trim() : '';
+          if (!studentId) return;
+          if (!presensiMap[studentId]) presensiMap[studentId] = {};
+          if (!presensiMap[studentId][d]) presensiMap[studentId][d] = {};
+          const sholatName = item.jenisSholat ? item.jenisSholat.toString().trim() : '';
+          presensiMap[studentId][d][sholatName] = sholatName;
+        }
+      });
+
+      const classPrayerDays = {};
+      const allClassNames = [...new Set(allSiswaList.map(s => (s.kelas || '').toString().trim().toUpperCase()))];
+
+      allClassNames.forEach(kName => {
+        if (!kName) return;
+        classPrayerDays[kName] = {};
+        const classStudentsCount = allSiswaList.filter(s => (s.kelas || '').toString().trim().toUpperCase() === kName).length || 1;
+
+        for (let h = 1; h <= totalHariBulan; h++) {
+          const setAttended = new Set();
+          rawRekapData.forEach(item => {
+            if (!item.waktu) return;
+            const dateStr = item.waktu.toString().split(' ')[0];
+            const parts = dateStr.split('-');
+            if (parts.length < 3) return;
+            if (parseInt(parts[0], 10) === tahunInt && parseInt(parts[1], 10) === bulanInt && parseInt(parts[2], 10) === h) {
+              if ((item.kelas || '').toString().trim().toUpperCase() === kName) {
+                const itemSholat = (item.jenisSholat || '').toString().trim();
+                if (selectedSholat === 'ALL' || itemSholat === selectedSholat || itemSholat === 'Haid') {
+                  if (item.idAnak) setAttended.add(item.idAnak.toString().trim());
+                }
+              }
+            }
+          });
+          const minThreshold = Math.max(2, Math.ceil(classStudentsCount * 0.25));
+          classPrayerDays[kName][h] = setAttended.size >= minThreshold;
+        }
+      });
+
+      const summaryList = targetSiswa.map((s, idx) => {
+        const sId = s.idAnak ? s.idAnak.toString().trim() : '';
+        const sKelas = (s.kelas || '').toString().trim().toUpperCase();
+
+        let countHariSholat = 0;
+        let countHadirSholat = 0;
+        let countHaid = 0;
+        let countTidakSholat = 0;
+        const tanggalTidak = [];
+
+        for (let h = 1; h <= totalHariBulan; h++) {
+          const isPrayerDay = classPrayerDays[sKelas] && classPrayerDays[sKelas][h];
+          const dayData = (presensiMap[sId] && presensiMap[sId][h]) ? presensiMap[sId][h] : null;
+
+          if (isPrayerDay) countHariSholat++;
+
+          let hasSholat = false;
+          let hasHaid = false;
+
+          if (dayData) {
+            if (selectedSholat === 'ALL') {
+              if (dayData['Haid']) hasHaid = true;
+              const otherKeys = Object.keys(dayData).filter(k => k !== 'Haid');
+              if (otherKeys.length > 0) hasSholat = true;
+            } else {
+              if (dayData[selectedSholat]) hasSholat = true;
+              if (dayData['Haid']) hasHaid = true;
+            }
+          }
+
+          if (hasSholat) countHadirSholat++;
+          if (hasHaid) countHaid++;
+
+          if (isPrayerDay && !hasSholat && !hasHaid) {
+            countTidakSholat++;
+            tanggalTidak.push(h);
+          }
+        }
+
+        return {
+          no: s.no || (idx + 1),
+          idAnak: sId,
+          nisn: s.nisn || '-',
+          namaAnak: s.namaAnak,
+          lp: s.lp || '-',
+          kelas: s.kelas,
+          countHariSholat,
+          countHadirSholat,
+          countHaid,
+          countTidakSholat,
+          tanggalTidak
+        };
+      });
+
+      summaryList.sort((a, b) => b.countTidakSholat - a.countTidakSholat);
+
+      const tbody = document.getElementById('summaryTableBody');
+      document.getElementById('summaryTotalSiswa').innerText = `Total: ${summaryList.length} Siswa`;
+
+      if (summaryList.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" class="p-4 text-center text-slate-400">Tidak ada data.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = summaryList.map((item, idx) => `
+        <tr class="border-b hover:bg-slate-50 text-[11px]">
+          <td class="p-2 text-center font-mono">${idx + 1}</td>
+          <td class="p-2 text-center font-mono font-semibold">${item.idAnak}</td>
+          <td class="p-2 font-semibold text-slate-800">${item.namaAnak}</td>
+          <td class="p-2 text-center">${item.lp}</td>
+          <td class="p-2 text-center font-bold text-slate-600">${item.kelas}</td>
+          <td class="p-2 text-center font-bold text-blue-700">${item.countHariSholat}</td>
+          <td class="p-2 text-center font-bold text-emerald-700">${item.countHadirSholat}</td>
+          <td class="p-2 text-center font-bold text-rose-700">${item.countHaid}</td>
+          <td class="p-2 text-center font-extrabold ${item.countTidakSholat > 0 ? 'text-red-600 bg-red-50' : 'text-slate-400'}">${item.countTidakSholat}</td>
+          <td class="p-2 text-left text-[10px] text-slate-600 max-w-[200px]" title="${item.tanggalTidak.join(', ')}">
+            ${item.tanggalTidak.length > 0 ? item.tanggalTidak.map(t => `<span class="inline-block bg-red-100 text-red-800 px-1 py-0.2 rounded font-mono mr-0.5 mb-0.5">${t}</span>`).join('') : '<span class="text-emerald-600 font-semibold">Nihil / Selalu Hadir</span>'}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function setTodayFilter() {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      document.getElementById('filterTanggal').value = `${yyyy}-${mm}-${dd}`;
+      renderFilteredRekap();
+    }
+
+    function resetRekapFilter() {
+      document.getElementById('filterTanggal').value = '';
+      document.getElementById('filterKelas').value = 'ALL';
+      document.getElementById('filterSholat').value = 'ALL';
+      renderFilteredRekap();
+    }
+
+    async function loadUsers() {
+      const tbody = document.getElementById('userTableBody');
+      tbody.innerHTML = '<tr><td colspan="3" class="p-3 text-center text-slate-400">Memuat data...</td></tr>';
+      try {
+        const result = await postToGoogleSheets({ action: "get_users" });
+        if (result.status === 'success' && result.data.length > 0) {
+          tbody.innerHTML = result.data.map(u => `
+            <tr class="border-b text-[11px]">
+              <td class="p-2 font-mono font-semibold">${u.username}</td>
+              <td class="p-2">${u.nama}</td>
+              <td class="p-2"><span class="bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded font-bold">${u.role}</span></td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="3" class="p-3 text-center text-slate-400">Belum ada user.</td></tr>';
+        }
+      } catch(e) {
+        tbody.innerHTML = '<tr><td colspan="3" class="p-3 text-center text-red-400">Gagal memuat user.</td></tr>';
+      }
+    }
+
+    async function handleTambahUser(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnTambahUser');
+      btn.disabled = true;
+      btn.innerText = 'Menyimpan...';
+
+      try {
+        const result = await postToGoogleSheets({
+          action: "simpan_user",
+          username: document.getElementById('newUsername').value.trim(),
+          password: document.getElementById('newPassword').value.trim(),
+          nama: document.getElementById('newNama').value.trim(),
+          role: document.getElementById('newRole').value
+        });
+
+        alert(result.message);
+        if (result.status === 'success') {
+          document.getElementById('newUsername').value = '';
+          document.getElementById('newPassword').value = '';
+          document.getElementById('newNama').value = '';
+          loadUsers();
+        }
+      } catch(e) {
+        alert("Gagal menambah user.");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-plus mr-1"></i> Tambah User Baru';
+      }
+    }
+
+    function switchTab(tab) {
+      const p = checkRolePermissions();
+      if (tab === 'wajah' && !p.wajah) return;
+      if (tab === 'rekap' && !p.rekap) return;
+      if (tab === 'users' && !p.users) return;
+
+      currentTab = tab;
+      const btnP = document.getElementById('tabBtnPresensi');
+      const btnW = document.getElementById('tabBtnWajah');
+      const btnR = document.getElementById('tabBtnRekap');
+      const btnU = document.getElementById('tabBtnUsers');
+      
+      const contentP = document.getElementById('tabContentPresensi');
+      const contentW = document.getElementById('tabContentWajah');
+      const contentR = document.getElementById('tabContentRekap');
+      const contentU = document.getElementById('tabContentUsers');
+
+      const activeClass = "flex-1 py-2.5 text-center text-[11px] font-bold border-b-2 border-emerald-600 text-emerald-700 bg-emerald-50";
+      const inactiveClass = "flex-1 py-2.5 text-center text-[11px] font-bold text-slate-500 hover:text-emerald-600";
+
+      contentP.classList.add('hidden');
+      contentW.classList.add('hidden');
+      contentR.classList.add('hidden');
+      contentU.classList.add('hidden');
+
+      btnP.className = inactiveClass;
+      btnW.className = inactiveClass;
+      btnR.className = inactiveClass;
+      btnU.className = inactiveClass;
+
+      applyRolePermissions();
+
+      if (tab === 'presensi') {
+        contentP.classList.remove('hidden');
+        btnP.className = activeClass;
+        startCamera('webcamPresensi').then(() => startAutoPresensiLoop());
+      } else if (tab === 'wajah') {
+        contentW.classList.remove('hidden');
+        btnW.className = activeClass;
+        startCamera('webcamWajah');
+      } else if (tab === 'rekap') {
+        contentR.classList.remove('hidden');
+        btnR.className = activeClass;
+        stopCamera();
+        loadRekap();
+      } else if (tab === 'users') {
+        contentU.classList.remove('hidden');
+        btnU.className = activeClass;
+        stopCamera();
+        loadUsers();
+      }
+    }
+
+    window.onload = () => {
+      const savedUser = localStorage.getItem('spensaka_app_user');
+      if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        initDashboard();
+      }
+    };
+  </script>
+</body>
+</html>
