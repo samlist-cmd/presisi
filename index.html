@@ -588,7 +588,7 @@
       return k === f;
     }
 
-    // HELPER URUTKAN DAFAR SISWA BERDASARKAN KELAS (7A..9I..GURU) LALU NAMA
+    // HELPER URUTKAN DAFTAR SISWA BERDASARKAN KELAS (7A..9I..GURU) LALU NAMA
     function sortSiswaByKelasAndName(list) {
       return [...list].sort((a, b) => {
         const kA = (a.kelas || '').toString().trim();
@@ -772,8 +772,8 @@
       const listDescriptors = filteredItems.map(item => item.descriptor);
 
       if (listDescriptors.length > 0) {
-        // DISTANCE THRESHOLD PERKETAT KE 0.32 UNTUK BEBAS SALAH DETEKSI
-        faceMatcher = new faceapi.FaceMatcher(listDescriptors, 0.32);
+        // DISTANCE THRESHOLD DISESUAIKAN KE 0.36 AGAR PEKA SAAT MENDUNG
+        faceMatcher = new faceapi.FaceMatcher(listDescriptors, 0.36);
       } else {
         faceMatcher = null;
       }
